@@ -1,9 +1,12 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as shader from "./Shaders/Shader";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { Loader } from "three";
 
 export default class Sketch {
   constructor(selector) {
+    console.log("[*] Constructor running")
     console.log(selector);
     this.scene = new THREE.Scene();
     this.container = selector;
@@ -45,7 +48,7 @@ export default class Sketch {
     this.settings = {
       progress: 0,
     };
-    this.gui = new dat.GUI();
+    this.gui = new GUI();
     this.gui.add(this.settings, "progress", 0, 1, 0.01);
   }
 
@@ -63,28 +66,43 @@ export default class Sketch {
 
   addObjects() {
     let that = this;
-    this.material = new THREE.ShaderMaterial({
-      extensions: {
-        derivatives: "#extension GL_OES_standard_derivatives : enable",
-      },
-      side: THREE.DoubleSide,
-      uniforms: {
-        time: { type: "f", value: 0 },
-        resolution: { type: "v4", value: new THREE.Vector4() },
-        uvRate1: {
-          value: new THREE.Vector2(1, 1),
-        },
-      },
-      // wireframe: true,
-      // transparent: true,
-      vertexShader: shader.vertex,
-      fragmentShader: shader.fragment,
+    const scene = this.scene
+    
+    // add test plane
+    // this.material = new THREE.ShaderMaterial({
+    //   extensions: {
+    //     derivatives: "#extension GL_OES_standard_derivatives : enable",
+    //   },
+    //   side: THREE.DoubleSide,
+    //   uniforms: {
+    //     time: { type: "f", value: 0 },
+    //     resolution: { type: "v4", value: new THREE.Vector4() },
+    //     uvRate1: {
+    //       value: new THREE.Vector2(1, 1),
+    //     },
+    //   },
+    //   // wireframe: true,
+    //   // transparent: true,
+    //   vertexShader: shader.vertex,
+    //   fragmentShader: shader.fragment,
+    // });
+
+    // this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
+    // this.plane = new THREE.Mesh(this.geometry, this.material);
+    // this.scene.add(this.plane);
+
+    // add a source of light
+    const light = new THREE.HemisphereLight(); //TODO play with colors
+    scene.add(light);
+
+    // add the palladium card
+    const loader = new GLTFLoader();
+    loader.load('/3d-assets/palladium_card.glb', function (gltf) {
+      scene.add(gltf.scene)
+    }, undefined, function (error) {
+      console.error(error)
     });
 
-    this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-
-    this.plane = new THREE.Mesh(this.geometry, this.material);
-    this.scene.add(this.plane);
   }
 
   stop() {
@@ -101,7 +119,7 @@ export default class Sketch {
   render() {
     if (!this.isPlaying) return;
     this.time += 0.05;
-    this.material.uniforms.time.value = this.time;
+    // this.material.uniforms.time.value = this.time;
     requestAnimationFrame(this.render.bind(this));
     this.renderer.render(this.scene, this.camera);
   }

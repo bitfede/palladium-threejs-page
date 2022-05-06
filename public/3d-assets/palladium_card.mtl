@@ -1,0 +1,31 @@
+# Blender MTL File: 'palladium_card.blend'
+# Material Count: 3
+
+newmtl Material.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.324925 0.316633 0.339687
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+
+newmtl None
+Ns 500
+Ka 0.8 0.8 0.8
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl palladium_front
+Ns 253.039483
+Ka 1.000000 1.000000 1.000000
+Kd 0.601685 0.601685 0.601685
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\Il_de\\Downloads\\card-4kres.png

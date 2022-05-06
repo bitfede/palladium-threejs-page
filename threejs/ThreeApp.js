@@ -15,22 +15,20 @@ export default class Sketch {
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0xeeeeee, 1);
+    this.renderer.setClearColor(0x1e272e, 1);
     this.renderer.outputEncoding = THREE.sRGBEncoding;
 
     this.container.appendChild(this.renderer.domElement);
 
     this.camera = new THREE.PerspectiveCamera(
-      70,
+      50,
       window.innerWidth / window.innerHeight,
-      0.001,
+      0.01,
       1000
     );
 
-    // var frustumSize = 10;
-    // var aspect = window.innerWidth / window.innerHeight;
-    // this.camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000, 1000 );
-    this.camera.position.set(0, 0, 2);
+    this.camera.position.set(0.008, 3.662, 9.631);
+    this.camera.rotation.set(THREE.Math.degToRad(-20.42), 0, 0)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.time = 0;
 
@@ -67,41 +65,53 @@ export default class Sketch {
   addObjects() {
     let that = this;
     const scene = this.scene
-    
-    // add test plane
-    // this.material = new THREE.ShaderMaterial({
-    //   extensions: {
-    //     derivatives: "#extension GL_OES_standard_derivatives : enable",
-    //   },
-    //   side: THREE.DoubleSide,
-    //   uniforms: {
-    //     time: { type: "f", value: 0 },
-    //     resolution: { type: "v4", value: new THREE.Vector4() },
-    //     uvRate1: {
-    //       value: new THREE.Vector2(1, 1),
-    //     },
-    //   },
-    //   // wireframe: true,
-    //   // transparent: true,
-    //   vertexShader: shader.vertex,
-    //   fragmentShader: shader.fragment,
-    // });
-
-    // this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-    // this.plane = new THREE.Mesh(this.geometry, this.material);
-    // this.scene.add(this.plane);
 
     // add a source of light
-    const light = new THREE.HemisphereLight(); //TODO play with colors
-    scene.add(light);
+    // const light = new THREE.AmbientLight(); //TODO play with colors
+    // scene.add(light);
+    const pointLight = new THREE.PointLight( 0xffffff, 1 );
+    pointLight.position.set(0,2,0);
+    this.scene.add(pointLight);
+
 
     // add the palladium card
     const loader = new GLTFLoader();
     loader.load('/3d-assets/palladium_card.glb', function (gltf) {
-      scene.add(gltf.scene)
+      console.log(gltf);
+      const cardObj = gltf.scene;
+      //traverse objects to put material on card front face
+      cardObj.traverse( function (node) {
+        if (node instanceof THREE.Mesh && node.name === "Plane") {
+          console.log(node.name, node)
+          // node.material.map = cardMat;
+          node.material = new THREE.MeshPhysicalMaterial({
+            color: 0x474747,
+            reflectivity: 0.80,
+            roughness: 0.4,
+            metalness: 0.0,
+          })
+        }
+      })
+
+
+      cardObj.position.set(0,0,-5.582);
+      cardObj.scale.set(0.5,0.5,0.5);
+      cardObj.rotation.set(THREE.Math.degToRad(69),0,0);
+      scene.add(cardObj);
     }, undefined, function (error) {
-      console.error(error)
+      console.error(error);
     });
+
+    //add the logo in front
+    const planeGeometry = new THREE.PlaneGeometry(2, 2, 2, 2);
+    const planeTexture = new THREE.TextureLoader().load('/ethereum-logo.png');
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      map: planeTexture,
+      transparent: true
+    });
+    this.defiLogo = new THREE.Mesh(planeGeometry, planeMaterial);
+    this.defiLogo.position.set(0,-3,-5);
+    this.scene.add(this.defiLogo);
 
   }
 
@@ -122,5 +132,19 @@ export default class Sketch {
     // this.material.uniforms.time.value = this.time;
     requestAnimationFrame(this.render.bind(this));
     this.renderer.render(this.scene, this.camera);
+
+    //sets the initial counter value
+    if (this.time < 1) {
+      this.startTime = 0;
+    }
+
+    //the interval loop
+    // 10 time units =~ 3 seconds
+    if (this.time - this.startTime >= 30 ) {
+      console.log(this.time, "tick");
+      this.startTime = this.time;
+    }
+
+    
   }
 }

@@ -76,13 +76,15 @@ export default class Sketch {
 
     // add the palladium card
     const loader = new GLTFLoader();
-    loader.load('/3d-assets/palladium_card.glb', function (gltf) {
+    loader.load('/3d-assets/palladium_card-v2.glb', function (gltf) {
       console.log(gltf);
       const cardObj = gltf.scene;
       //traverse objects to put material on card front face
       cardObj.traverse( function (node) {
-        if (node instanceof THREE.Mesh && node.name === "Plane") {
+        console.log("NODE", node)
+        if (node instanceof THREE.Mesh && node.name === "Card_2003") {
           console.log(node.name, node)
+          console.log(node.material, "yaaa")
           // node.material.map = cardMat;
           node.material = new THREE.MeshPhysicalMaterial({
             color: 0x474747,
@@ -94,7 +96,7 @@ export default class Sketch {
       })
 
 
-      cardObj.position.set(0,0,-5.582);
+      cardObj.position.set(-2.20,1,-5.582);
       cardObj.scale.set(0.5,0.5,0.5);
       cardObj.rotation.set(THREE.Math.degToRad(69),0,0);
       scene.add(cardObj);

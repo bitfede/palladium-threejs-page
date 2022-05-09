@@ -82,7 +82,7 @@ export default class Sketch {
       //traverse objects to put material on card front face
       cardObj.traverse( function (node) {
         console.log("NODE", node)
-        if (node instanceof THREE.Mesh && node.name === "Card_2003") {
+        if (node instanceof THREE.Mesh && node.name === "card_v3") {
           console.log(node.name, node)
           console.log(node.material, "yaaa")
           // node.material.map = cardMat;
@@ -96,7 +96,7 @@ export default class Sketch {
       })
 
 
-      cardObj.position.set(-2.20,1,-5.582);
+      cardObj.position.set(0,0,-5.582);
       cardObj.scale.set(0.5,0.5,0.5);
       cardObj.rotation.set(THREE.Math.degToRad(69),0,0);
       scene.add(cardObj);

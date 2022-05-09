@@ -83,14 +83,17 @@ export default class Sketch {
       cardObj.traverse( function (node) {
         console.log("NODE", node)
         if (node instanceof THREE.Mesh && node.name === "card_v3") {
+          node.castShadow = true;
+          node.receiveShadow = false;
+          // node.material = stmtl;
           console.log(node.name, node)
           console.log(node.material, "yaaa")
           // node.material.map = cardMat;
           node.material = new THREE.MeshPhysicalMaterial({
-            color: 0x474747,
-            reflectivity: 0.80,
-            roughness: 0.4,
-            metalness: 0.0,
+            color: 0x878681,
+            reflectivity: 0.42,
+            roughness: 0.58,
+            metalness: 0.92,
           })
         }
       })

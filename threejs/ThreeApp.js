@@ -13,7 +13,7 @@ export default class Sketch {
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
     this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setPixelRatio(window.devicePixelRatio*2);
     this.renderer.setSize(this.width, this.height);
     this.renderer.setClearColor(0x1e272e, 1);
     this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -23,11 +23,11 @@ export default class Sketch {
     this.camera = new THREE.PerspectiveCamera(
       50,
       window.innerWidth / window.innerHeight,
-      0.01,
+      0.1,
       1000
     );
 
-    this.camera.position.set(0.008, 3.662, 9.631);
+    this.camera.position.set(0, 0.4, 3);
     this.camera.rotation.set(THREE.Math.degToRad(-20.42), 0, 0)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.time = 0;

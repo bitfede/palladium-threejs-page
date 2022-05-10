@@ -11,6 +11,8 @@ export default class Sketch {
     console.log(selector);
     this.scene = new THREE.Scene();
     this.container = selector;
+    this.state = 0;
+    this.states = [];
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
     this.renderer = new THREE.WebGLRenderer();
@@ -37,6 +39,7 @@ export default class Sketch {
 
     this.isPlaying = true;
 
+    this.setupStates();
     this.addObjects();
     this.resize();
     this.render();
@@ -58,6 +61,33 @@ export default class Sketch {
     window.addEventListener("resize", this.resize.bind(this));
   }
 
+  setupStates() {
+    const states = [
+      {
+        color: 0x7600D9,
+        logo: '/defi-logos/apy-vision-logo.png'
+      },
+      {
+        color: 0x3A17F5,
+        logo: '/defi-logos/augmented-finance-logo.png'
+      },
+      {
+        color: 0x8FEBA01,
+        logo: '/defi-logos/curve-logo.png'
+      },
+      {
+        color: 0x004DE6,
+        logo: 'defi-logos/defi-yearn-logo.png'
+      },
+      {
+        color: 0x8AC06A,
+        logo: '/defi-logos/ethereum-logo.png'
+      }
+    ]
+
+    this.states = states;
+  }
+
   resize() {
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
@@ -69,13 +99,13 @@ export default class Sketch {
   addObjects() {
     let that = this;
     const scene = this.scene
-
+    const currentState = this.states[this.state];
     // add a source of light
     // const light = new THREE.AmbientLight(); //TODO play with colors
     // scene.add(light);
-    const pointLight = new THREE.PointLight( 0xffffff, 1 );
-    pointLight.position.set(0,2,0);
-    this.scene.add(pointLight);
+    this.light = new THREE.PointLight( currentState.color, 1 );;
+    this.light.position.set(0,2,0);
+    this.scene.add(this.light);
 
     //load envmap
     const textureLoader = new THREE.TextureLoader();
@@ -116,7 +146,7 @@ export default class Sketch {
 
     //add the logo in front
     const planeGeometry = new THREE.PlaneGeometry(2, 2, 2, 2);
-    const planeTexture = new THREE.TextureLoader().load('/ethereum-logo.png');
+    const planeTexture = new THREE.TextureLoader().load(currentState.logo);
     const planeMaterial = new THREE.MeshBasicMaterial({
       map: planeTexture,
       transparent: true
@@ -125,6 +155,13 @@ export default class Sketch {
     this.defiLogo.position.set(0,-3,-5);
     this.scene.add(this.defiLogo);
 
+  }
+
+  nextState() {
+    this.state = this.state + 1;
+    if (this.state >= this.states.length ) {
+      this.state = 0;
+    }
   }
 
   stop() {
@@ -152,9 +189,13 @@ export default class Sketch {
 
     //the interval loop
     // 10 time units =~ 3 seconds
-    if (this.time - this.startTime >= 30 ) {
+    if (this.time - this.startTime >= 20 ) {
       console.log(this.time, "tick");
       this.startTime = this.time;
+      //call next state
+      this.nextState();
+      console.log("CURRENT STATE ---> ", this.state, this.states)
+      console.log("this.light", this.light)
     }
 
     //listen to mouse and store coordinate x and y
@@ -168,7 +209,16 @@ export default class Sketch {
         if (!cardObj) return;
         const xratio = this.mouseX / window.innerWidth;
         cardObj.rotation.z = ((xratio * 1) - 0.5) * -1;
-        // TODO improvement: add slight movement on Y axis too     
+        // TODO improvement: add slight movement on Y axis too 
     }
+
+    // get the current state and modify scene/obj values accordingly
+    const currentState = this.states[this.state];
+    if (currentState) {
+      this.light.color = new THREE.Color( currentState.color );
+      this.defiLogo.material.map = new THREE.TextureLoader().load(currentState.logo);
+    }
+
+
   }
 }

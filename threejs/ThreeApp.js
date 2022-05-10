@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as shader from "./Shaders/Shader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
 import { Loader } from "three";
 
 export default class Sketch {
@@ -15,8 +16,10 @@ export default class Sketch {
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setPixelRatio(window.devicePixelRatio*2);
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0x1e272e, 1);
+    this.renderer.setClearColor(0x050203, 1);
     this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.mouseX = 0;
+    this.mouseY = 0;
 
     this.container.appendChild(this.renderer.domElement);
 
@@ -39,6 +42,7 @@ export default class Sketch {
     this.render();
     this.setupResize();
     // this.settings();
+
   }
 
   settings() {
@@ -73,36 +77,40 @@ export default class Sketch {
     pointLight.position.set(0,2,0);
     this.scene.add(pointLight);
 
+    //load envmap
+    const textureLoader = new THREE.TextureLoader();
+    const envmap = textureLoader.load('/moonless_golf.jpeg');
 
     // add the palladium card
     const loader = new GLTFLoader();
     loader.load('/3d-assets/palladium_card-v2.glb', function (gltf) {
       console.log(gltf);
-      const cardObj = gltf.scene;
+      that.cardObj = gltf.scene;
       //traverse objects to put material on card front face
-      cardObj.traverse( function (node) {
+      that.cardObj.traverse( function (node) {
         console.log("NODE", node)
         if (node instanceof THREE.Mesh && node.name === "card_v3") {
           node.castShadow = true;
           node.receiveShadow = false;
-          // node.material = stmtl;
-          console.log(node.name, node)
-          console.log(node.material, "yaaa")
-          // node.material.map = cardMat;
+          // console.log(node.name, node)
+          // console.log(node.material, "yaaa")
+          // console.log("envmap", envmap)
           node.material = new THREE.MeshPhysicalMaterial({
             color: 0x878681,
             reflectivity: 0.42,
-            roughness: 0.58,
+            roughness: 0.48,
             metalness: 0.92,
+            envMap: envmap
           })
+
         }
       })
 
 
-      cardObj.position.set(0,0,-5.582);
-      cardObj.scale.set(0.5,0.5,0.5);
-      cardObj.rotation.set(THREE.Math.degToRad(69),0,0);
-      scene.add(cardObj);
+      that.cardObj.position.set(0,0,-5.582);
+      that.cardObj.scale.set(0.5,0.5,0.5);
+      that.cardObj.rotation.set(THREE.Math.degToRad(69),0,0);
+      scene.add(that.cardObj);
     }, undefined, function (error) {
       console.error(error);
     });
@@ -150,6 +158,22 @@ export default class Sketch {
       this.startTime = this.time;
     }
 
-    
+    //listen to mouse and store coordinate x and y
+    const cardObj = this.cardObj;
+
+    document.onmousemove = function(e){
+        console.log("AAAAAA", e.clientX, "/", window.innerWidth)
+        this.mouseX = e.pageX;
+        this.mouseY = e.pageY;
+
+        //update the position of the card 
+        //mousex : window width = cardRotX : 10
+        if (!cardObj) return;
+        const xratio = this.mouseX / window.innerWidth;
+        cardObj.rotation.z = ((xratio * 1) - 0.5) * -1;
+        console.log("ROTATION", cardObj.rotation.z);
+
+        
+    }
   }
 }

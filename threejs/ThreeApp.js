@@ -84,11 +84,10 @@ export default class Sketch {
     // add the palladium card
     const loader = new GLTFLoader();
     loader.load('/3d-assets/palladium_card-v2.glb', function (gltf) {
-      console.log(gltf);
       that.cardObj = gltf.scene;
       //traverse objects to put material on card front face
       that.cardObj.traverse( function (node) {
-        console.log("NODE", node)
+        console.log("[*] TRAVERSING NODE", node)
         if (node instanceof THREE.Mesh && node.name === "card_v3") {
           node.castShadow = true;
           node.receiveShadow = false;
@@ -162,18 +161,14 @@ export default class Sketch {
     const cardObj = this.cardObj;
 
     document.onmousemove = function(e){
-        console.log("AAAAAA", e.clientX, "/", window.innerWidth)
         this.mouseX = e.pageX;
         this.mouseY = e.pageY;
 
         //update the position of the card 
-        //mousex : window width = cardRotX : 10
         if (!cardObj) return;
         const xratio = this.mouseX / window.innerWidth;
         cardObj.rotation.z = ((xratio * 1) - 0.5) * -1;
-        console.log("ROTATION", cardObj.rotation.z);
-
-        
+        // TODO improvement: add slight movement on Y axis too     
     }
   }
 }

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as shader from "./Shaders/Shader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-
+import gsap from "gsap";
 import { Loader } from "three";
 
 export default class Sketch {
@@ -106,6 +106,8 @@ export default class Sketch {
     this.light = new THREE.PointLight( currentState.color, 1 );;
     this.light.position.set(0,2,0);
     this.scene.add(this.light);
+    this.animated = false;
+    this.currentTween;
 
     //load envmap
     const textureLoader = new THREE.TextureLoader();
@@ -162,6 +164,7 @@ export default class Sketch {
     if (this.state >= this.states.length ) {
       this.state = 0;
     }
+    this.animated = false;
   }
 
   stop() {
@@ -185,6 +188,7 @@ export default class Sketch {
     //sets the initial counter value
     if (this.time < 1) {
       this.startTime = 0;
+      return
     }
 
     //the interval loop
@@ -194,8 +198,6 @@ export default class Sketch {
       this.startTime = this.time;
       //call next state
       this.nextState();
-      console.log("CURRENT STATE ---> ", this.state, this.states)
-      console.log("this.light", this.light)
     }
 
     //listen to mouse and store coordinate x and y
@@ -215,8 +217,17 @@ export default class Sketch {
     // get the current state and modify scene/obj values accordingly
     const currentState = this.states[this.state];
     if (currentState) {
-      this.light.color = new THREE.Color( currentState.color );
-      this.defiLogo.material.map = new THREE.TextureLoader().load(currentState.logo);
+      if (this.animated === false) {
+        this.light.color = new THREE.Color( currentState.color );
+        console.log("light", this.light)
+        gsap.fromTo(this.light,{intensity: 0}, {intensity: 1, duration: 4});
+        gsap.to(this.light, {intensity: 0, duration: 4, delay: 4});
+
+        this.defiLogo.material.map = new THREE.TextureLoader().load(currentState.logo);  
+        gsap.fromTo(this.defiLogo.material,{opacity: 0}, {opacity: 1, duration: 4})
+        gsap.to(this.defiLogo.material, {opacity: 0, duration: 4, delay: 4})
+        this.animated = true;
+      }
     }
 
 

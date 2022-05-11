@@ -105,7 +105,7 @@ export default class Sketch {
     // scene.add(light);
     this.light = new THREE.PointLight( currentState.color, 1 );;
     this.light.position.set(0,2,0);
-    this.light.intensity = 0;
+    this.light.intensity = 0.1;
     this.scene.add(this.light);
     this.animated = false;
     this.currentTween;
@@ -222,7 +222,7 @@ export default class Sketch {
         const that = this;
         this.light.color = new THREE.Color( currentState.color );
         console.log("light", this.light)
-        gsap.fromTo(this.light,{intensity: 0}, {intensity: 1, duration: 4, onComplete: function() {gsap.to(that.light, {intensity: 0, duration: 4})}, onCompleteParams: [that]});
+        gsap.fromTo(this.light,{intensity: 0.1}, {intensity: 1, duration: 4, onComplete: function() {gsap.to(that.light, {intensity: 0.1, duration: 4})}, onCompleteParams: [that]});
 
         this.defiLogo.material.map = new THREE.TextureLoader().load(currentState.logo);  
         gsap.fromTo(this.defiLogo.material,{opacity: 0}, {opacity: 1, duration: 4, onComplete: function() {gsap.to(that.defiLogo.material, {opacity: 0, duration: 4})}, onCompleteParams: [that] })

@@ -213,6 +213,8 @@ export default class Sketch {
         const xratio = this.mouseX / window.innerWidth;
         cardObj.rotation.z = ((xratio * 1) - 0.5) * -1;
         // TODO improvement: add slight movement on Y axis too 
+        const yratio = this.mouseY / window.innerHeight;
+        cardObj.rotation.x = THREE.Math.degToRad( 69 + ((yratio * 10)) );
     }
 
     // get the current state and modify scene/obj values accordingly

@@ -105,6 +105,7 @@ export default class Sketch {
     // scene.add(light);
     this.light = new THREE.PointLight( currentState.color, 1 );;
     this.light.position.set(0,2,0);
+    this.light.intensity = 0;
     this.scene.add(this.light);
     this.animated = false;
     this.currentTween;
@@ -155,6 +156,7 @@ export default class Sketch {
     });
     this.defiLogo = new THREE.Mesh(planeGeometry, planeMaterial);
     this.defiLogo.position.set(0,-3,-5);
+    this.defiLogo.material.opacity = 0;
     this.scene.add(this.defiLogo);
 
   }
@@ -192,8 +194,7 @@ export default class Sketch {
     }
 
     //the interval loop
-    // 10 time units =~ 3 seconds
-    if (this.time - this.startTime >= 20 ) {
+    if (this.time - this.startTime >= 24.2 ) {
       console.log(this.time, "tick");
       this.startTime = this.time;
       //call next state
@@ -218,13 +219,13 @@ export default class Sketch {
     const currentState = this.states[this.state];
     if (currentState) {
       if (this.animated === false) {
+        const that = this;
         this.light.color = new THREE.Color( currentState.color );
         console.log("light", this.light)
-        gsap.fromTo(this.light,{intensity: 0}, {intensity: 1, duration: 4});
-        gsap.to(this.light, {intensity: 0, duration: 4, delay: 4});
+        gsap.fromTo(this.light,{intensity: 0}, {intensity: 1, duration: 4, onComplete: function() {gsap.to(that.light, {intensity: 0, duration: 4})}, onCompleteParams: [that]});
 
         this.defiLogo.material.map = new THREE.TextureLoader().load(currentState.logo);  
-        gsap.fromTo(this.defiLogo.material,{opacity: 0}, {opacity: 1, duration: 4})
+        gsap.fromTo(this.defiLogo.material,{opacity: 0}, {opacity: 1, duration: 4, onComplete: function() {gsap.to(that.defiLogo.material, {opacity: 0, duration: 4})}, onCompleteParams: [that] })
         gsap.to(this.defiLogo.material, {opacity: 0, duration: 4, delay: 4})
         this.animated = true;
       }
